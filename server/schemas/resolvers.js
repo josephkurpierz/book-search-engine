@@ -9,7 +9,7 @@ const resolvers = {
       if (context.user) {
         const userData = await User.findOne({ _id: context.user._id })
           .select("-__v -password")
-          .populate("books");
+         
         return userData;
       }
       throw new AuthenticationError('Not logged in"');
@@ -20,7 +20,6 @@ const resolvers = {
     addUser: async (parent, args) => {
       const user = await User.create(args);
       const token = signToken(user);
-      console.log({ user }, { token });
       return { token, user };
     },
     // equivalent to login in user-controller
@@ -39,7 +38,7 @@ const resolvers = {
     //equivalent to saveBook from user-controller
     saveBook: async (parent, { bookData }, context) => {
       if (context.user) {
-        const user = await User.findOneAndUpdate(
+        const user = await User.findByIdAndUpdate(
           { _id: context.user._id },
           { $push: { savedBooks: bookData } },
           { new: true }
@@ -50,7 +49,7 @@ const resolvers = {
     },
     removeBook: async (parent, { bookId }, context) => {
       if (context.user) {
-        const user = await User.findOneAndUpdate(
+        const user = await User.findByIdAndUpdate(
           { _id: context.user._id },
           { $pull: { savedBooks: { bookID } } },
           { new: true }
